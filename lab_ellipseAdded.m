@@ -145,8 +145,14 @@ function main
     [xVals_CDE, yVals_CDE, grid_CDE] = prepareGrid(gridSize, dataC, dataD, dataE);
 
     
-    %plot_MED(grid_AB, xVals_AB, yVals_AB, AB_means, 1);
-    plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, 2);
+    ab = plot_MED(grid_AB, xVals_AB, yVals_AB, AB_means, 1);
+    figure(1);
+    contour(xVals_AB, yVals_AB,ab);
+    hold on;
+    cde = plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, 2);
+    figure(2);
+    contour(xVals_CDE, yVals_CDE,cde);
+    hold on;
     %plot_GED(grid_AB, xVals_AB, yVals_AB, AB_tmeans, AB_transforms);
     
     print('help')
@@ -203,7 +209,9 @@ classDistances=[];
 
 %compare mean A and mean B
 for i = 1:length(meanArgs)
-    distance = sum(meanArgs(:,i) - point).^2;
+%     distance = sum(meanArgs(:,i) - point).^2;
+    m = meanArgs(:,i);
+    distance = sqrt((m(1)-point(1))^2 + (m(2)-point(2))^2);
     classDistances =[classDistances distance];
 end
 
@@ -216,8 +224,10 @@ classDistances=[];
 
 for i = 1:length(meanArgs)
     shit = i*2;
-    pt = transformArgs(:, shit -1 : shit) * point;
-    distance = sum(meanArgs(:,i) - pt).^2;
+    pt_transformed = transformArgs(:, shit -1 : shit) * point;
+    m = meanArgs(:,i);
+    distance = sqrt((m(1)-pt_transformed(1))^2 + (m(2)-pt_transformed(2))^2);
+    %distance = sum(meanArgs(:,i) - pt).^2;
     classDistances =[classDistances distance];
 end
 
@@ -234,7 +244,8 @@ function [xVals, yVals, classGrid] = prepareGrid (gridSize, varargin)
     minY_val=[];
     maxX_val=[];
     maxY_val=[];
-
+    X_lens = [];
+    Y_lens = [];
     %iterate through each dataset and get the bounds
     for i = 1:length(varargin)
         xVals = varargin{i}(:, 1);
@@ -244,37 +255,45 @@ function [xVals, yVals, classGrid] = prepareGrid (gridSize, varargin)
         maxX_val = [minX_val max(xVals)];
         minY_val = [minY_val min(yVals)];
         maxY_val = [maxY_val max(yVals)];
+        X_lens = [X_lens length(xVals)];
+        Y_lens = [Y_lens length(yVals)];
     end
     
     %return a nice grid
     xVals = min(minX_val) - offset: gridSize : max(maxX_val) + offset;
-    yVals = min(minY_val) - offset: gridSize : max(maxX_val) + offset;
+    yVals = min(minY_val) - offset: gridSize : max(maxY_val) + offset;
+    
+    %classGrid = zeros(length(yVals), length(xVals));
     classGrid = zeros(length(yVals), length(xVals));
 
 end
 
-function plot_MED(grid, xVals, yVals, meanArgs, fig)
+function classifier = plot_MED(grid, xVals, yVals, meanArgs, fig)
 
     classifier = repmat(grid, 1);
-    
     for i = 1:numel(classifier)
+%         disp(i)
         [row col] = ind2sub(size(classifier), i);
+%         disp(strcat('col', num2str(col)));
+%         disp(strcat('row', num2str(row)));
         classIndex = MED_Class([xVals(col);yVals(row)], meanArgs);
         classifier(i) = classIndex;
     end
-    figure(fig);
-    contour(classifier);
-    hold on;
+    
+%     return classifier;
+%     figure;
+%     contour(classifier);
+%     hold on;
 end
 
-function plot_GED(grid, xVals, yVals, mean_transformed_Args, AB_transforms)
+function plot_GED(grid, xVals, yVals, mean_transformed_Args, mat_transforms)
 
     classifier = repmat(grid, 1);
     for i = 1:numel(classifier)
         [row col] = ind2sub(size(classifier), i);
-        classIndex = GED_Class([xVals(col);yVals(row)], mean_transformed_Args, AB_transforms);
-        GED_AB(i) = classIndex;       
+        classIndex = GED_Class([xVals(col);yVals(row)], mean_transformed_Args, mat_transforms);
+        classifier(i) = classIndex;       
     end
     figure(1);
-    contour(GED_AB);   
+    contour(classifier);   
 end
