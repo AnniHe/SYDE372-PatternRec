@@ -3,6 +3,7 @@ function main
     clear;
     clf();
 
+    gridSize = 0.1;
     %CASE 1:
 
     Na = 200;
@@ -101,17 +102,17 @@ function main
     draw_circle(muB_whitened, colourB);
 
     %MED: plot MED decision boundary with original means
-    syms xA xB;
-    ezplot(transpose(muB - muA)*[xA; xB] + 1/2 * (transpose(muA) * muA - transpose(muB) * muB) == 0, [-100, 100]);
-    %GED: plot GED decision boundary with Whitening-transformed means
-    syms xA_w xB_w;
-    ezplot(transpose(muB_whitened - muA_whitened)*[xA_w; xB_w] + 1/2 * (transpose(muA_whitened) * muA_whitened - transpose(muB_whitened) * muB_whitened) == 0, [-100, 100]);
+%     syms xA xB;
+%     %ezplot(transpose(muB - muA)*[xA; xB] + 1/2 * (transpose(muA) * muA - transpose(muB) * muB) == 0, [-100, 100]);
+%     %GED: plot GED decision boundary with Whitening-transformed means
+%     syms xA_w xB_w;
+%     ezplot(transpose(muB_whitened - muA_whitened)*[xA_w; xB_w] + 1/2 * (transpose(muA_whitened) * muA_whitened - transpose(muB_whitened) * muB_whitened) == 0, [-100, 100]);
 
     %MAP:
-    countAB = size(dataA) + size(dataB);
-    pA = size(dataA)/countAB;
-    pB = size(dataB)/countAB;
-    MAP_2classes(covarA, covarB, muA, muB, pA, pB);
+%     countAB = size(dataA) + size(dataB);
+%     pA = size(dataA)/countAB;
+%     pB = size(dataB)/countAB;
+    %MAP_2classes(covarA, covarB, muA, muB, pA, pB);
 
     %NN:
     %For every point in A, find shortest distance to a B point, find mid
@@ -127,33 +128,27 @@ function main
     %syms xC xD xE;
     %explot();
 
-    %testing meshgrid stuff
-
-    %draw meshgrid
-    %     xMin = min(dataA(1));
-    %     xMax = min(dataA(2));
-    %     yMin = max(dataA(1));
-    %     yMax = max(dataA(2));
-
-
-    %     plot(meshgrid(-5:5,-5:5));
-    %
-    %     xrange = [-8 8];
-    % yrange = [-8 8];
-    % % step size for how finely you want to visualize the decision boundary.
-    % inc = 0.1;
-    %
-    % % generate grid coordinates. this will be the basis of the decision
-    % % boundary visualization.
-    % (meshgrid(xrange(1):inc:xrange(2), yrange(1):inc:yrange(2)));
 
     %-----------------
     %
     %-----------------
-    for i = 1:size(MED_distances)
-    MED_Class = MED_Class()
-    end
+    AB_means = [muA muB]
+    AB_tmeans = [muA_whitened muB_whitened]
+    AB_transforms = [whiten_A whiten_B]
+    
+    CDE_means = [muC muD muE]
+    CDE_tmeans = [muC_whitened muD_whitened muE_whitened]
+    CDE_transforms = [whiten_C whiten_D whiten_E]
+    
+    %Grid Helper
+    [xVals_AB, yVals_AB, grid_AB] = prepareGrid(gridSize, dataA, dataB);
+    [xVals_CDE, yVals_CDE, grid_CDE] = prepareGrid(gridSize, dataC, dataD, dataE);
 
+    
+    %plot_MED(grid_AB, xVals_AB, yVals_AB, AB_means, 1);
+    plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, 2);
+    %plot_GED(grid_AB, xVals_AB, yVals_AB, AB_tmeans, AB_transforms);
+    
     print('help')
 end
 
@@ -203,22 +198,35 @@ plot( pts(1,:), pts(2,:), colour);
 end
 
 %Returns an array of [minimum, the class that was classified]
-function MED_Class(point, meanArgs)
+function classType = MED_Class(point, meanArgs)
 classDistances=[];
 
 %compare mean A and mean B
 for i = 1:length(meanArgs)
-distance = sum(meanArgs(i) - point).^2
-classDistances =[classDistances distance] %literally just adds another column
+    distance = sum(meanArgs(:,i) - point).^2;
+    classDistances =[classDistances distance];
 end
 
-[minDistance, classType] = min(classDistances)
+[minDistance, classType] = min(classDistances);
 end
 
+%Returns an array of [minimum, the class that was classified]
+function classType = GED_Class(point, meanArgs, transformArgs)
+classDistances=[];
+
+for i = 1:length(meanArgs)
+    shit = i*2;
+    pt = transformArgs(:, shit -1 : shit) * point;
+    distance = sum(meanArgs(:,i) - pt).^2;
+    classDistances =[classDistances distance];
+end
+
+[minDistance, classType] = min(classDistances);
+end
 
 % varargs - can take in multiple args, like varargs in java
 %           random gaussian distrubution points
-function [xVals, yVals, classGrid] = prepareGrid (gridSize, varargs)
+function [xVals, yVals, classGrid] = prepareGrid (gridSize, varargin)
     offset = 2;
     
     % Input gridsize and the (2D) data sets
@@ -228,24 +236,45 @@ function [xVals, yVals, classGrid] = prepareGrid (gridSize, varargs)
     maxY_val=[];
 
     %iterate through each dataset and get the bounds
-    for i = 1:length(varargs)
-        xVals = varargs{k}(:, 1);
-        yVals = varargs{k}(:, 2);
+    for i = 1:length(varargin)
+        xVals = varargin{i}(:, 1);
+        yVals = varargin{i}(:, 2);
         %bullshit matlab syntax
-        minX_val = [minX_vals min(xVals)];
-        maxX_val = [minX_vals max(xVals)];
-        minY_val = [minY_vals min(yVals)];
-        maxY_val = [maxY_vals max(yVals)];
+        minX_val = [minX_val min(xVals)];
+        maxX_val = [minX_val max(xVals)];
+        minY_val = [minY_val min(yVals)];
+        maxY_val = [maxY_val max(yVals)];
     end
     
     %return a nice grid
-    xVals = min(minX_val) - offset: gridSize : max(maxX_vals) + offset;
-    yVals = min(minY_val) - offset: gridSize : max(maxX_vals) + offset;
+    xVals = min(minX_val) - offset: gridSize : max(maxX_val) + offset;
+    yVals = min(minY_val) - offset: gridSize : max(maxX_val) + offset;
     classGrid = zeros(length(yVals), length(xVals));
 
 end
 
-% function med(mean1, mean2)
-%     x1 = [0:1:100]
-%     x2 = transpose(mean1-mean2) * x - 1/2*(transpose(mean1) * mean1 - mean2 * transpose(mean2)
-%
+function plot_MED(grid, xVals, yVals, meanArgs, fig)
+
+    classifier = repmat(grid, 1);
+    
+    for i = 1:numel(classifier)
+        [row col] = ind2sub(size(classifier), i);
+        classIndex = MED_Class([xVals(col);yVals(row)], meanArgs);
+        classifier(i) = classIndex;
+    end
+    figure(fig);
+    contour(classifier);
+    hold on;
+end
+
+function plot_GED(grid, xVals, yVals, mean_transformed_Args, AB_transforms)
+
+    classifier = repmat(grid, 1);
+    for i = 1:numel(classifier)
+        [row col] = ind2sub(size(classifier), i);
+        classIndex = GED_Class([xVals(col);yVals(row)], mean_transformed_Args, AB_transforms);
+        GED_AB(i) = classIndex;       
+    end
+    figure(1);
+    contour(GED_AB);   
+end
