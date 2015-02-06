@@ -3,7 +3,12 @@ function main
     clear;
     clf();
 
+    %Constants
+    k = 5;
+    fig_AB = 1;
+    fig_CDE = 2;
     gridSize = 0.1;
+    
     %CASE 1:
 
     Na = 200;
