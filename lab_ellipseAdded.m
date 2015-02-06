@@ -137,6 +137,12 @@ function main
     contour(xVals_CDE, yVals_CDE,ged_cde);
     hold on;
     
+    plot_nn(k, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
+    plot_nn(1, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
+    
+    plot_nn(1, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
+    plot_nn(k, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
+    
     print('help')
 end
 
