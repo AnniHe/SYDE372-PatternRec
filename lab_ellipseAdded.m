@@ -216,26 +216,33 @@ end
 end
 
 
-% gridSize -
 % varargs - can take in multiple args, like varargs in java
 %           random gaussian distrubution points
-function prepareGrid (gridSize, varargs)
-% Input gridsize and the (2D) data sets
-minX_val=[];
-minY_val=[];
-maxX_val=[];
-maxY_val=[];
+function [xVals, yVals, classGrid] = prepareGrid (gridSize, varargs)
+    offset = 2;
+    
+    % Input gridsize and the (2D) data sets
+    minX_val=[];
+    minY_val=[];
+    maxX_val=[];
+    maxY_val=[];
 
-for i = 1:length(varargs)
-xVals = (:, 1);
-yVals = (:, 2);
+    %iterate through each dataset and get the bounds
+    for i = 1:length(varargs)
+        xVals = varargs{k}(:, 1);
+        yVals = varargs{k}(:, 2);
+        %bullshit matlab syntax
+        minX_val = [minX_vals min(xVals)];
+        maxX_val = [minX_vals max(xVals)];
+        minY_val = [minY_vals min(yVals)];
+        maxY_val = [maxY_vals max(yVals)];
+    end
+    
+    %return a nice grid
+    xVals = min(minX_val) - offset: gridSize : max(maxX_vals) + offset;
+    yVals = min(minY_val) - offset: gridSize : max(maxX_vals) + offset;
+    classGrid = zeros(length(yVals), length(xVals));
 
-%bullshit matlab syntax
-minX_val = [minX_vals min(xVals)];
-maxX_val = [minX_vals max(xVals)];
-minY_val = [minY_vals min(yVals)];
-maxY_val = [maxY_vals max(yVals)];
-end
 end
 
 % function med(mean1, mean2)
