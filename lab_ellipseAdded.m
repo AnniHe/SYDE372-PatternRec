@@ -3,12 +3,7 @@ function main
     clear;
     clf();
 
-    %Constants
-    k = 5;
-    fig_AB = 1;
-    fig_CDE = 2;
     gridSize = 0.1;
-    
     %CASE 1:
 
     Na = 200;
@@ -115,39 +110,50 @@ function main
     AB_means = [muA muB]
     AB_tmeans = [muA_whitened muB_whitened]
     AB_transforms = [whiten_A whiten_B]
+    AB_stdDev = [transpose(cov2corr(covarA)) transpose(cov2corr(covarB))]
+    AB_probs = [Na/(Na+Nb) Nb/(Na+Nb)]
+    AB_covars = [covarA covarB]
     
     CDE_means = [muC muD muE]
     CDE_tmeans = [muC_whitened muD_whitened muE_whitened]
     CDE_transforms = [whiten_C whiten_D whiten_E]
+    CDE_stdDev = [transpose(cov2corr(covarC)) transpose(cov2corr(covarD)) transpose(cov2corr(covarE))]
+    CDE_probs = [Nc/(Nc+Nd+Ne) Nd/(Nc+Nd+Ne) Ne/(Nc+Nd+Ne)]
+    CDE_covars = [covarC covarD covarE]
     
     %Grid Helper
     [xVals_AB, yVals_AB, grid_AB] = prepareGrid(gridSize, dataA, dataB);
     [xVals_CDE, yVals_CDE, grid_CDE] = prepareGrid(gridSize, dataC, dataD, dataE);
 
-    med_ab = plot_MED(grid_AB, xVals_AB, yVals_AB, AB_means, 1);
     figure(1);
-    contour(xVals_AB, yVals_AB,med_ab);
-    hold on;
-    ged_ab = plot_GED(grid_AB, xVals_AB, yVals_AB, AB_tmeans, AB_transforms);
-    figure(1);
-    contour(xVals_AB, yVals_AB,ged_ab);
-    hold on;
-    
-    med_cde = plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, 2);
+%     med_ab = plot_MED(grid_AB, xVals_AB, yVals_AB, AB_means, 1);
+%     contour(xVals_AB, yVals_AB,med_ab);
+%     hold on;
+%     ged_ab = plot_GED(grid_AB, xVals_AB, yVals_AB, AB_tmeans, AB_transforms);
+%     contour(xVals_AB, yVals_AB,ged_ab);
+%     hold on;
+%     map_ab = plot_MAP(grid_AB, xVals_AB, yVals_AB, AB_means, AB_covars, AB_probs);
+%     contour(xVals_AB, yVals_AB, map_ab);
+%     hold on;
+   
     figure(2);
-    contour(xVals_CDE, yVals_CDE,med_cde);
+%     med_cde = plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, 2);
+%     contour(xVals_CDE, yVals_CDE,med_cde);
+%     hold on;
+%     ged_cde = plot_GED(grid_CDE, xVals_CDE, yVals_CDE, CDE_tmeans, CDE_transforms);
+%     contour(xVals_CDE, yVals_CDE,ged_cde);
+% %     hold on;
+    map_cde = plot_MAP(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, CDE_covars, CDE_probs);
+    contour(xVals_CDE, yVals_CDE, map_cde);
     hold on;
-    ged_cde = plot_GED(grid_CDE, xVals_CDE, yVals_CDE, CDE_tmeans, CDE_transforms);
-    figure(2);
-    contour(xVals_CDE, yVals_CDE,ged_cde);
-    hold on;
-    
+%    
+
+        
     plot_nn(k, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
     plot_nn(1, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
     
     plot_nn(1, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
     plot_nn(k, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
-    
     print('help')
 end
 
@@ -225,6 +231,18 @@ end
 [minDistance, classType] = min(classDistances);
 end
 
+function classType = MAP_Class(pt, meanArgs, covarArgs, probArgs)
+classVals = [];
+for i = 1:length(meanArgs)
+    shit = i*2;
+    disp(i);
+    val = (probArgs(i)* exp( (-1/2) * transpose(pt - meanArgs(i))*inv(covarArgs(:,shit-1:shit))*(pt - meanArgs(i))))/((2*pi)*sqrt(det(covarArgs(:,shit-1:shit))));
+    classVals = [classVals val];
+end
+
+[minVal, classType] = max(classVals);
+end
+
 % varargs - can take in multiple args, like varargs in java
 %           random gaussian distrubution points
 function [xVals, yVals, classGrid] = prepareGrid (gridSize, varargin)
@@ -263,12 +281,20 @@ function classifier = plot_MED(grid, xVals, yVals, meanArgs, fig)
 end
 
 function classifier = plot_GED(grid, xVals, yVals, mean_transformed_Args, mat_transforms)
-
     classifier = repmat(grid, 1);
     for i = 1:numel(classifier)
         [row col] = ind2sub(size(classifier), i);
         classIndex = GED_Class([xVals(col);yVals(row)], mean_transformed_Args, mat_transforms);
         classifier(i) = classIndex;       
+    end
+end
+
+function classifier = plot_MAP(grid, xVals, yVals, meanArgs, covarArgs, probsArgs)
+    classifier = repmat(grid, 1);
+    for i = 1:numel(classifier)
+        [row col] = ind2sub(size(classifier), i);
+        classIndex = MAP_Class([xVals(col);yVals(row)],meanArgs, covarArgs, probsArgs);
+        classifier(i) = classIndex;
     end
 end
 
