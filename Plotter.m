@@ -36,10 +36,8 @@ classdef Plotter
             end
 
             contour(xVals, yVals, classifier, 'r');
-            legend('MED');
             hold on;
-            
-            
+
         end
 
         function classifier = plot_GED(grid, xVals, yVals, mean_transformed_Args, mat_transforms)
@@ -64,17 +62,19 @@ classdef Plotter
             hold on;
         end
         
-        function classifier = plot_nn(k, grid, xVals, yVals, fig, varargin)
+        function classifier = plot_nn(k, grid, xVals, yVals, varargin)
 
             classifier = repmat(grid, 1);
             for i = 1:numel(classifier)
                 [row col] = ind2sub(size(classifier), i);
-                classIndex = NN_Class(k,[xVals(col);yVals(row)], fig,varargin{:});
+                classIndex = NN_Class(k,[xVals(col);yVals(row)],varargin{:});
                 classifier(i) = classIndex; 
             end
-            figure(fig);
-            [C,h] = contour(xVals,yVals,classifier);
-            plot(C);
+            if k > 1
+                contour(xVals,yVals,classifier, 'r');
+            else
+                contour(xVals, yVals, classifier, 'b');
+            end
             hold on;
         end
         

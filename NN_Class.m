@@ -1,4 +1,4 @@
-function classType = NN_Class(k, point, fig, varargin)
+function classType = NN_Class(k, point, varargin)
 
     minDistances = [];
     %for A,B,C,D,E
