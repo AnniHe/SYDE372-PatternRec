@@ -27,16 +27,19 @@ classdef Plotter
             classGrid = zeros(length(yVals), length(xVals));
         end
       
-        function classifier = plot_MED(grid, xVals, yVals, meanArgs, fig)
-        classifier = repmat(grid, 1);
+        function classifier = plot_MED(grid, xVals, yVals, meanArgs)
+            classifier = repmat(grid, 1);
             for i = 1:numel(classifier)
                 [row col] = ind2sub(size(classifier), i);
                 classIndex = MED_Class([xVals(col);yVals(row)], meanArgs);
                 classifier(i) = classIndex;
             end
-            figure(fig)
-            contour(xVals, yVals, classifier);
+
+            contour(xVals, yVals, classifier, 'r');
+            legend('MED');
             hold on;
+            
+            
         end
 
         function classifier = plot_GED(grid, xVals, yVals, mean_transformed_Args, mat_transforms)
@@ -46,8 +49,7 @@ classdef Plotter
                 classIndex = GED_Class([xVals(col);yVals(row)], mean_transformed_Args, mat_transforms);
                 classifier(i) = classIndex;       
             end
-%             figure(f);
-            contour(xVals, yVals,classifier);
+            contour(xVals, yVals,classifier, 'k');
             hold on;
         end
 
@@ -58,9 +60,11 @@ classdef Plotter
                 classIndex = MAP_Class([xVals(col);yVals(row)],meanArgs, covarArgs, probsArgs);
                 classifier(i) = classIndex;
             end
+            contour(xVals,yVals,classifier, 'g');
+            hold on;
         end
         
-        function plot_nn(k, grid, xVals, yVals, fig, varargin)
+        function classifier = plot_nn(k, grid, xVals, yVals, fig, varargin)
 
             classifier = repmat(grid, 1);
             for i = 1:numel(classifier)
@@ -69,7 +73,8 @@ classdef Plotter
                 classifier(i) = classIndex; 
             end
             figure(fig);
-            contour(xVals,yVals,classifier);
+            [C,h] = contour(xVals,yVals,classifier);
+            plot(C);
             hold on;
         end
         

@@ -7,6 +7,7 @@ function main
     fig_AB = 1;
     fig_CDE = 2;
     k = 5;
+    
     %CASE 1:
 
     Na = 200;
@@ -38,6 +39,7 @@ function main
     %Generate bivariate normal distribution with mean vector and covariance
     %matrix
     dataA = gen_normal_distribution(Na, muA, covarA);
+    %dataTest = gen_normal_distribution(Na, muA, covarA);
     figure(1);
     scatter(dataA(:,1), dataA(:,2), 5, colourA, 'filled');
     hold on;
@@ -108,67 +110,49 @@ function main
     Draw.draw_circle(muD_whitened, colourD);
     Draw.draw_circle(muE_whitened, colourE);
 
-    AB_means = [muA muB]
-    AB_tmeans = [muA_whitened muB_whitened]
-    AB_transforms = [whiten_A whiten_B]
-    AB_stdDev = [transpose(cov2corr(covarA)) transpose(cov2corr(covarB))]
-    AB_probs = [Na/(Na+Nb) Nb/(Na+Nb)]
-    AB_covars = [covarA covarB]
+    AB_means = [muA muB];
+    AB_tmeans = [muA_whitened muB_whitened];
+    AB_transforms = [whiten_A whiten_B];
+    AB_probs = [Na/(Na+Nb) Nb/(Na+Nb)];
+    AB_covars = [covarA covarB];
     
-    CDE_means = [muC muD muE]
-    CDE_tmeans = [muC_whitened muD_whitened muE_whitened]
-    CDE_transforms = [whiten_C whiten_D whiten_E]
-    CDE_stdDev = [transpose(cov2corr(covarC)) transpose(cov2corr(covarD)) transpose(cov2corr(covarE))]
-    CDE_probs = [Nc/(Nc+Nd+Ne) Nd/(Nc+Nd+Ne) Ne/(Nc+Nd+Ne)]
-    CDE_covars = [covarC covarD covarE]
+    CDE_means = [muC muD muE];
+    CDE_tmeans = [muC_whitened muD_whitened muE_whitened];
+    CDE_transforms = [whiten_C whiten_D whiten_E];
+    CDE_probs = [Nc/(Nc+Nd+Ne) Nd/(Nc+Nd+Ne) Ne/(Nc+Nd+Ne)];
+    CDE_covars = [covarC covarD covarE];
     
     %Grid Helper
     [xVals_AB, yVals_AB, grid_AB] = Plotter.prepareGrid(gridSize, dataA, dataB);
     [xVals_CDE, yVals_CDE, grid_CDE] = Plotter.prepareGrid(gridSize, dataC, dataD, dataE);
 
     figure(1);
-    Plotter.plot_MED(grid_AB, xVals_AB, yVals_AB, AB_means, 1);
-    Plotter.plot_GED(grid_AB, xVals_AB, yVals_AB, AB_tmeans, AB_transforms);
-    Plotter.plot_nn(1, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
-    Plotter.plot_nn(k, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
+    MED_AB = Plotter.plot_MED(grid_AB, xVals_AB, yVals_AB, AB_means);
+    GED_AB = Plotter.plot_GED(grid_AB, xVals_AB, yVals_AB, AB_tmeans, AB_transforms);
+    MAP_AB = Plotter.plot_MAP(grid_AB, xVals_AB, yVals_AB, AB_means, AB_covars, AB_probs);
+    NN_AB  = Plotter.plot_nn(1, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
+    KNN_AB = Plotter.plot_nn(k, grid_AB, xVals_AB, yVals_AB, fig_AB, dataA, dataB);
 
     figure(2);
-    Plotter.plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, 2);
-    Plotter.plot_GED(grid_CDE, xVals_CDE, yVals_CDE, CDE_tmeans, CDE_transforms);
-    Plotter.plot_nn(1, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
-    Plotter.plot_nn(k, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
-    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    % tested up to here
-    %
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                                  
-    
-    
-    
-%     contour(xVals_AB, yVals_AB,ged_ab);
-%     hold on;
-%     map_ab = plot_MAP(grid_AB, xVals_AB, yVals_AB, AB_means, AB_covars, AB_probs);
-%     contour(xVals_AB, yVals_AB, map_ab);
-%     hold on;
-   
+    MED_CDE = Plotter.plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means);
+    GED_CDE = Plotter.plot_GED(grid_CDE, xVals_CDE, yVals_CDE, CDE_tmeans, CDE_transforms);
+ 	MAP_CDE = Plotter.plot_MAP(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, CDE_covars, CDE_probs);
+    NN_CDE  = Plotter.plot_nn(1, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
+ 	KNN_CDE = Plotter.plot_nn(k, grid_CDE, xVals_CDE, yVals_CDE, fig_CDE, dataC, dataD, dataE);
 
-%     med_cde = plot_MED(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, 2);
-%     contour(xVals_CDE, yVals_CDE,med_cde);
-%     hold on;
-%     ged_cde = 
-%     contour(xVals_CDE, yVals_CDE,ged_cde);
-% %     hold on;
-    map_cde = Plotter.plot_MAP(grid_CDE, xVals_CDE, yVals_CDE, CDE_means, CDE_covars, CDE_probs);
-    contour(xVals_CDE, yVals_CDE, map_cde);
-    hold on;
-%    
-
-        
+    ErrorAnalysis.confusion(xVals_AB, yVals_AB, MED_AB, 'MED', dataA, dataB);
+    ErrorAnalysis.confusion(xVals_AB, yVals_AB, GED_AB, 'GED', dataA, dataB);
+    ErrorAnalysis.confusion(xVals_AB, yVals_AB, MAP_AB, 'MAP', dataA, dataB);
+    ErrorAnalysis.confusion(xVals_AB, yVals_AB, NN_AB, 'NN', dataA, dataB);
+    ErrorAnalysis.confusion(xVals_AB, yVals_AB, KNN_AB, 'KNN', dataA, dataB);
+    
+    ErrorAnalysis.confusion(xVals_CDE, yVals_CDE, MED_CDE, 'MED', dataC, dataD, dataE);
+    ErrorAnalysis.confusion(xVals_CDE, yVals_CDE, GED_CDE, 'GED', dataC, dataD, dataE);
+    ErrorAnalysis.confusion(xVals_CDE, yVals_CDE, MAP_CDE, 'MAP', dataC, dataD, dataE);
+    ErrorAnalysis.confusion(xVals_CDE, yVals_CDE, NN_CDE, 'NN', dataC, dataD, dataE);
+    ErrorAnalysis.confusion(xVals_CDE, yVals_CDE, KNN_CDE,'kNN', dataC, dataD, dataE);
 
 end
-
-
 
 function gauss = gen_normal_distribution(N, mu, covar)
     rand = randn(N,2);
@@ -179,12 +163,3 @@ end
 function [V,D] = get_eigenvalues(matrix)
     [V,D] = eig(matrix);
 end
-
-
-
-
-
-
-
-
-
