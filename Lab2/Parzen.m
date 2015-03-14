@@ -1,30 +1,4 @@
 classdef Parzen
-    %   Non-parametric estimation using a gaussian parzen function
-    %   sample can be 1 dimensional or a 2dimensional dataset  
-    
-    %
-    % Parzen - compute 2-D density estimates
-    %
-    % [p,x,y] = parzen( data, res, win )    
-    %
-    %  data - two-column matrix of (x,y) points
-    %         (third row/col optional point frequency)
-    %  res  - resolution (step size)
-    %         optionally [res lowx lowy highx highy]
-    %  win  - optional, gives form of window 
-    %          if a scalar - radius of square window
-    %          if a vector - radially symmetric window
-    %          if a matrix - actual 2D window shape
-    %
-    %  x    - locations along x-axis
-    %  y    - locations along y-axis
-    %  p    - estimated 2D PDF
-    %
-
-    %
-    % P. Fieguth
-    % Nov. 1997
-    %
     methods (Static)
         function p = plot(sample, sigma)
 
@@ -63,7 +37,46 @@ classdef Parzen
             
         end
         
+        function p2d = plot2D(al,bl,cl,sigma)
+            %Create a matrix window with a Gaussian shape
+            %http://dali.feld.cvut.cz/ucebna/matlab/toolbox/images/fspecial.html
+            window = fspecial('gaussian', [100 100], sigma);
+
+            %Resolution (step size)
+            %Determines the spatial step between PDF estimates
+            lowx = min([min(al(:,1)), min(bl(:,1)), min(cl(:,1))]);
+            lowy = min([min(al(:,2)), min(bl(:,2)), min(cl(:,2))]);
+            highx = max([max(al(:,1)), max(bl(:,1)), max(cl(:,1))]);
+            highy = max([max(al(:,2)), max(bl(:,2)), max(cl(:,2))]);
+            step = 1;
+            resolution = [step (lowx) (lowy) (highx) (highy)];
+
+            [pdfA, xA, yA] = Parzen.parzen2D(al, resolution, window);
+            [pdfB, xB, yB] = Parzen.parzen2D(bl, resolution, window);
+            [pdfC, xC, yC] = Parzen.parzen2D(cl, resolution, window);
+
+            %Create a grid
+            grid = zeros(length(xA),length(yA));
+
+            %Classify each square on grid using ML
+            for i = 1:length(xA)-1
+                for j = 1:(length(yA)-1)
+                    grid(i,j) = ML.classify(i,j, pdfA, pdfB, pdfC);
+                end
+            end
+            
+            %Plot points and ML boundary
+            figure();
+            hold on;
+            contour(xA,yA,grid');
+            scatter(al(:,1),al(:,2));
+            scatter(bl(:,1),bl(:,2));
+            scatter(cl(:,1),cl(:,2)); 
+            hold off;
+        end
+        
         function [p,x,y] = parzen2D(data, res, win)
+            %Source: Paul Fieguth (Almighty God)
             if (size(data,2)>size(data,1)), data = data'; end;
             if (size(data,2)==2), data = [data ones(size(data))]; end;
             numpts = sum(data(:,3));
