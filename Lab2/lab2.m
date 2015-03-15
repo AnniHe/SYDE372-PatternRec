@@ -1,23 +1,39 @@
 clearvars; clc; close all;
 
-% -------------------------------
-% 1D - Parametric Estimation
-% Question x
-% -------------------------------
-
 load('lab2_1.mat');
 load('lab2_2.mat');
-
 dataAOne = OneDimData(a, 5, 1, 0);
-dataAOne = dataAOne.getNormPdf();
-dataAOne.plotAny();
+dataBOne = OneDimData(b, 1, 0, 1);
+
+% -----------------------------------
+% 2A - Parametric Estimation Gaussian
+% Question 2.1
+% -----------------------------------
+dataAOne.plotGaussian();
+dataBOne.plotGaussian(); %problem with this is that variance is set to 0
+% -----------------------------------
+% 2B - Parametric Estimation Exponential
+% Question 2.2
+% -----------------------------------
+dataAOne.plotExponential();
+dataBOne.plotExponential();
+% -------------------------------
+% 3C - Parametric Estimation Uniform
+% Question 2.3
+% -------------------------------
+dataAOne.plotUniform();
+dataBOne.plotUniform();
+
+dataBOne = dataBOne.getNormPdf();
+dataBOne.plotAny();
+
+
+
 
 %This is wack dawg
 %this doesn't work because the following line returns a bunch of NaN:
 %OneD.pdf_true = normpdf(OneD.range, OneD.mu_true, OneD.sigma_true); 
-dataBOne = OneDimData(b, 1, 0, 1);
-dataBOne = dataBOne.getNormPdf();
-dataBOne.plotAny();
+
 
 dataBTwo = OneDimData(b, 0, 0, 1);
 dataBTwo = dataBTwo.getExpPdf()

@@ -6,11 +6,15 @@ classdef Plot
     end
     
     methods (Static)
-        function plotNormPdf(mu, x, sigma, colour)
-            figure();
+        function plotNormPdf(x, mu, sigma, colour)
+%             figure();
             pdf = normpdf(x, mu, sigma);
             plot(x, pdf, colour);
 %             hold off;
+        end
+        function plotExponential(x,lamda, colour)
+            pdf = exppdf(x, lamda);
+            plot(x, pdf, colour);   
         end
     end
     

@@ -111,13 +111,6 @@ classdef Parzen
             y = [dl(2):res:(dh(2)+res)]; y = y(1:size(p,1));
 
         end
-        
-        function class = classifyML(x, y, pdfArgs)
-            class = -1;
-        end
-            
-            
-            
     end     
 end
         
