@@ -25,49 +25,42 @@ classdef OneDimData
             OneDimData.sigma = var(data);
             OneDimData.lambda = inv(OneDimData.mu);
             OneDimData.range = [min(data):0.01:max(data)];
-            OneDimData.getNormPdf();
         end
-        function plotAny(OneD)
-            figure;
-            plot(OneD.range, OneD.pdf, 'b');
-            hold on;
-            plot(OneD.range, OneD.pdf_true, 'r');
-            title('Gaussian Parametric Estimation: Data');
-            legend('Sample Distribution', 'True Distribution');
-        end
-        function plotGaussian(OneD)
-            figure();
-            Plot.plotNormPdf(OneD.range, OneD.mu_true, OneD.sigma_true, 'r');
-            hold on;
-            Plot.plotNormPdf(OneD.range, OneD.mu, OneD.sigma, 'b');
-            hold off;
-        end
-        function plotExponential(OneD)
-            figure();
-            Plot.plotExponentialPdf(OneD.range, OneD.lambda_true, 'r');
-            hold on;
-            Plot.plotExponentialPdf(OneD.range, OneD.lambda, 'b');
-            hold off;
-        end
-        function plotUniform(OneD)
-%             figure();
-%             Plot.plotExponential(OneD.range, OneD.lambda_true, 'r');
+%         function plotAny(OneD)
+%             figure;
+%             plot(OneD.range, OneD.pdf, 'b');
 %             hold on;
-%             Plot.plotExponential(OneD.range, OneD.lambda, 'b');
-%             hold off;
+%             plot(OneD.range, OneD.pdf_true, 'r');
+%             title('Gaussian Parametric Estimation: Data');
+%             legend('Sample Distribution', 'True Distribution');
+%         end
+        function plotEstimatedGaussian(OneD)
+            Plot.plotNormPdf(OneD.range, OneD.mu, OneD.sigma, 'b');
         end
-        function OneD = getNormPdf(OneD)
-            OneD.pdf = normpdf(OneD.range, OneD.mu, OneD.sigma);
-            OneD.pdf_true = normpdf(OneD.range, OneD.mu_true, OneD.sigma_true);          
+        function plotTrueGaussian(OneD)
+            Plot.plotNormPdf(OneD.range, OneD.mu_true, OneD.sigma_true, 'r');
         end
-        function OneD = getExpPdf(OneD)
-            OneD.pdf = exppdf(OneD.range, OneD.mu);
-            OneD.pdf_true = exppdf(OneD.range, OneD.lambda_true);          
+        function plotTrueExponential(OneD)
+            Plot.plotExponentialPdf(OneD.range, OneD.lambda_true, 'r');
         end
-        function OneD = getUniPdf(OneD)
-           OneD.pdf = unifpdf(OneD.range, min(OneD.data), max(OneD.data)); 
-           OneD.pdf_true = unifpdf(OneD.range, min(OneD.data), max(OneD.data));
+        function plotEstimatedExponential(OneD)
+            Plot.plotExponentialPdf(OneD.range, OneD.mu, 'b'); %requires mu not lamda
         end
+        function plotEstimatedUniform(OneD)
+            Plot.plotUniformPdf(OneD.range, min(OneD.data), max(OneD.data), 'b');
+        end
+%         function OneD = getNormPdf(OneD)
+%             OneD.pdf = normpdf(OneD.range, OneD.mu, OneD.sigma);
+%             OneD.pdf_true = normpdf(OneD.range, OneD.mu_true, OneD.sigma_true);          
+%         end
+%         function OneD = getExpPdf(OneD)
+%             OneD.pdf = exppdf(OneD.range, OneD.mu);
+%             OneD.pdf_true = exppdf(OneD.range, OneD.lambda_true);          
+%         end
+%         function OneD = getUniPdf(OneD)
+%            OneD.pdf = unifpdf(OneD.range, min(OneD.data), max(OneD.data)); 
+%            OneD.pdf_true = unifpdf(OneD.range, min(OneD.data), max(OneD.data));
+%         end
  
     end
     
