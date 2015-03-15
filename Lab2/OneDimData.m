@@ -24,7 +24,7 @@ classdef OneDimData
             OneDimData.mu = mean(data);
             OneDimData.sigma = var(data);
             OneDimData.lambda = inv(OneDimData.mu);
-            OneDimData.range = [min(data):0.01:max(data)];
+            OneDimData.range = [min(data)-5:0.01:max(data)+5];
         end
 %         function plotAny(OneD)
 %             figure;

@@ -85,6 +85,12 @@ Plot.applyCase(1);
 
 % -------------------------------
 % 2D - Non-parametric Estimation
+% Question 3.1
+% -------------------------------
+%ryan add your stuff here
+
+% -------------------------------
+% 2D - Non-parametric Estimation
 % Question 3.2
 % -------------------------------
 Parzen.plot2D(al,bl,cl,20);
