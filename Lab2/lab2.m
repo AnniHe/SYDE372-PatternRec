@@ -56,17 +56,17 @@ sigma2 = .4;
 muA = 5;
 range = [0:.1:10];
 Parzen.plot(range, a', sigma1);
-Plot.plotNormPdf(range, muA, 1, 'r', 1);
+Plot.plotNormPdf(range, muA, 1, 'r');
 Plot.applyCase(1);
 Parzen.plot(range, a', sigma2);
-Plot.plotNormPdf(range, muA, 1, 'r', 1);
+Plot.plotNormPdf(range, muA, 1, 'r');
 Plot.applyCase(1);
 
 Parzen.plot(range, b',sigma1);
-Plot.plotExponentialPdf(range, 1, 'r', 1);
+Plot.plotExponentialPdf(range, 1, 'r');
 Plot.applyCase(1);
 Parzen.plot(range, b',sigma2);
-Plot.plotExponentialPdf(range, 1, 'r', 1);
+Plot.plotExponentialPdf(range, 1, 'r');
 Plot.applyCase(1);
 
 % -------------------------------

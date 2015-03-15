@@ -1,10 +1,5 @@
 classdef Plot
-    %PLOT Summary of this class goes here
-    %   Detailed explanation goes here
-    
-    properties
-    end
-    
+
     methods (Static)
         function plotNormPdf(x, mu, sigma, colour)
 %             figure();
@@ -12,9 +7,27 @@ classdef Plot
             plot(x, pdf, colour);
 %             hold off;
         end
-        function plotExponential(x,lamda, colour)
-            pdf = exppdf(x, lamda);
-            plot(x, pdf, colour);   
+        function plotExponentialPdf(x, mu, colour, scalingfactor)
+            pdf = exppdf(x,mu);
+            plot(x, pdf, colour, 'LineWidth',2);
+            axis tight;
+            hold off;
+        end
+        function applyCase(graph, varargin)
+            switch graph
+                case 1
+                    legend('Estimated Density','True Density');
+                    xlabel('x');
+                    ylabel('PDF(X)');
+                case 2
+                    names = ['al'; 'bl'; 'cl'];
+                    for i = length(varargin)
+                        legend(varargin{i}, names(i));
+                    end
+                    xlabel('x');
+                    ylabel('y');
+            end
+
         end
     end
     

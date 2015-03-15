@@ -44,9 +44,9 @@ classdef OneDimData
         end
         function plotExponential(OneD)
             figure();
-            Plot.plotExponential(OneD.range, OneD.lambda_true, 'r');
+            Plot.plotExponentialPdf(OneD.range, OneD.lambda_true, 'r');
             hold on;
-            Plot.plotExponential(OneD.range, OneD.lambda, 'b');
+            Plot.plotExponentialPdf(OneD.range, OneD.lambda, 'b');
             hold off;
         end
         function plotUniform(OneD)

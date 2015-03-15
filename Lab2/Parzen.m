@@ -1,37 +1,36 @@
 classdef Parzen
     methods (Static)
-        function p = plot(sample, sigma)
+        function p = plot(range, sample, sigma)
 
             if size(sample, 2) == 2
                 n = 2;
                 sigma = cov(sample);
                 range = [min(sample) - 1 : .1 ; max(sample) +1];
-                
             else
                 n = 1;
             end
 
             N = length(sample); %number of samples
             parzen = [];
-            K = 100 %optimize this parameter
+            K = 10 %optimize this parameter
             h = K/sqrt(N); %width of window, formula in notes
 
             % height = 1/(N) * 1/width * 1;
-            range = [0:.1:10];
 
             for x = range
                 sum = 0;
                 %sum the sample constributions at each discrete step
                 for i = 1:N
                     mean = sample(i,:);  
-                    sum = sum + 1/h* evalGuassian(x, mean', sigma, n);
+                    sum = sum + 1/h* Gauss.evalGuassian(x, mean', sigma, n);
+%                     sum = sum + Gauss.evalGuassian(x, mean', sigma, n);
                 end
 
                 %keep track of the y (1D) z (2D) vals at each discrete step
                 parzen = [parzen 1/((N))*sum];
             end
             figure();
-            plot(range, parzen);
+            plot(range, parzen, 'b', 'LineWidth',2);
             hold on;
             
             
@@ -68,10 +67,11 @@ classdef Parzen
             %Plot points and ML boundary
             figure();
             hold on;
-            contour(xA,yA,grid');
-            scatter(al(:,1),al(:,2));
-            scatter(bl(:,1),bl(:,2));
-            scatter(cl(:,1),cl(:,2)); 
+            contour(xA,yA,grid', 'LineWidth',2);
+            s1 = scatter(al(:,1),al(:,2));
+            s2 = scatter(bl(:,1),bl(:,2));
+            s3 = scatter(cl(:,1),cl(:,2)); 
+            Plot.applyCase(2, s1, s2, s3);
             hold off;
         end
         
@@ -114,15 +114,14 @@ classdef Parzen
     end     
 end
         
-function result = evalGuassian(x, mean, sigma, n)
-    if n == 2
-        sigmaMagnitude = det(sigma)^(.5);
-        result = (1/(sigmaMagnitude*sqrt(2*pi)))*exp(-1/2*(inv(sigma)*(x-mean).^2));
-    else
-        result = (1/(sigma*sqrt(2*pi)))*exp(-1/(2*(sigma^2))*((x-mean)^2));
-    end
-    
-end
+% function result = evalGuassian(x, mean, sigma, n)
+%     if n == 2
+%         sigmaMagnitude = det(sigma)^(.5);
+%         result = (1/(sigmaMagnitude*sqrt(2*pi)))*exp(-1/2*(inv(sigma)*(x-mean).^2));
+%     else
+%         result = (1/(sigma*sqrt(2*pi)))*exp(-1/(2*(sigma^2))*((x-mean)^2));
+%     end
+% end
 
 
         
