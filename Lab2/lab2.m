@@ -93,6 +93,12 @@ Plot.applyCase(1);
 % 2D - Non-parametric Estimation
 % Question 3.2
 % -------------------------------
+Gaussian.plot2D(al,bl,cl);
+
+% -------------------------------
+% 2D - Non-parametric Estimation
+% Question 3.2
+% -------------------------------
 Parzen.plot2D(al,bl,cl,20);
 
 

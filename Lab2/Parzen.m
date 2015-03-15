@@ -22,7 +22,7 @@ classdef Parzen
                 %sum the sample constributions at each discrete step
                 for i = 1:N
                     mean = sample(i,:);  
-                    sum = sum + 1/h* Gauss.evalGuassian(x, mean', sigma, n);
+                    sum = sum + 1/h* Gaussian.evalGuassian(x, mean', sigma, n);
 %                     sum = sum + Gauss.evalGuassian(x, mean', sigma, n);
                 end
 
@@ -68,6 +68,9 @@ classdef Parzen
             figure();
             hold on;
             contour(xA,yA,grid', 'LineWidth',2);
+            contour(xA, yA, pdfA);
+            contour(xA, yA, pdfB);
+            contour(xA, yA, pdfC);
             s1 = scatter(al(:,1),al(:,2));
             s2 = scatter(bl(:,1),bl(:,2));
             s3 = scatter(cl(:,1),cl(:,2)); 
