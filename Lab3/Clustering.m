@@ -16,12 +16,15 @@ classdef Clustering
             
             %Calculate the distances
             classified = classifyMED(data, prototypes);
+            prevClassified = [];
             
             %iterate over and over again
             %Now iteratively go create new mean class prototypes
-            while(true)
+            while(~isequal(prevClassified, classified))
                 %compute new cluster prototype means
-                classified = pickMeanPrototypes(data,classified)
+                prevClassified = classified;
+                prototypes = pickMeanPrototypes(data,classified)
+                classified = classifyMED(data, prototypes);
                 
                 
                 %compare is classifed the same as before or not?
@@ -56,7 +59,7 @@ function CP = pickMeanPrototypes(data, classified)
         shizzles = find(classified == i);
         x = data(1, shizzles);
         y = data(2, shizzles);
-        CP(i,:) = [mean(x) mean(y)]
+        CP(i,:) = [mean(x) mean(y)];
 
     end
 
