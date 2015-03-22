@@ -26,5 +26,6 @@ multi_f8 = MICD.classify( multi_class, f8_mean, f8_whiten);
 
 cimage = reshape(multi_f8, size(multf8(:,:,1), 1), size(multf8(:,:,1), 2));
 imagesc(cimage);
+colormap(gray);
 
 
