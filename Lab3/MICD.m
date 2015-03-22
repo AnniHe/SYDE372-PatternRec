@@ -1,13 +1,16 @@
 classdef MICD
 
     methods (Static)
-        function class = classify(point, prototypes, weight)
+        function class = classify(points, prototypes, weights)
             class = zeros(size(points,1),1);
-            for i = 1:length(points)
+            for i = 1:size(points,1)
                 classDistances = [];
-                for j = 1:length(prototypes)
-                    m = prototypes(:,j) * weight;
-                    distance = sqrt((m(1)-points(i,1))^2 + (m(2)-points(i,2))^2);
+                for j = 1:size(prototypes,2)
+                    j_weight = j*2;
+                    point_t = weights(:,j_weight-1:j_weight) * points(i,:)';
+                    prototype_t = weights(:,j_weight-1:j_weight) * prototypes(:,j);
+                    
+                    distance = sqrt((prototype_t(1)-point_t(1))^2 + (prototype_t(2)-point_t(2))^2);
                     classDistances = [classDistances distance];
                 end
                 [~, classType] = min(classDistances);
@@ -17,4 +20,3 @@ classdef MICD
     end
     
 end
-
