@@ -1,21 +1,25 @@
 classdef Clustering
     %Explanations
-    %classified: 160 elements (for each sample point), value corresponds
-    %to a number 1-10 according to which class prototype is the closest.
+    % classified: 160 elements (for each sample point), value corresponds
+    % to a number 1-10 according to which class prototype is the closest.
+    % p0 - initial prototype selection - this is random
+    % pn - converted prototypes - after many iterations
     
     properties (Constant)
         K = 10;
+        p0;
     end
     
     methods (Static)
-        function doKMeans(data)
+        function doKMeans(data, p0)
             
             nrSamples = length(data);
             %Cluster prototype means
-            prototypes = pickRandomPrototypes(data)
+%             Clustering.p0 = pickRandomPrototypes(data);
+%             p0 = Clustering.p0;
             
             %Calculate the distances
-            classified = classifyMED(data, prototypes);
+            classified = classifyMED(data, p0);
             prevClassified = [];
             
             %iterate over and over again
@@ -23,8 +27,8 @@ classdef Clustering
             while(~isequal(prevClassified, classified))
                 %compute new cluster prototype means
                 prevClassified = classified;
-                prototypes = pickMeanPrototypes(data,classified)
-                classified = classifyMED(data, prototypes);
+                pn = pickMeanPrototypes(data,classified)
+                classified = classifyMED(data, pn);
                 
                 
                 %compare is classifed the same as before or not?
@@ -32,22 +36,29 @@ classdef Clustering
                 %if no, we are done
                 
             end
+            
+            Plotter.plotKMeans(data, p0, pn)
+            
+        end
+        
+        function CP = pickRandomPrototypes(data)
+            % gets a row of 10 columns with random indices from data set range
+            perms = randperm(size(data,2), Clustering.K);
+            %Cluster Prototypes
+            CP = zeros(length(perms),2);
+
+            for i = 1:length(CP)
+                CP(i,:) = [data(1,perms(i)) data(2, perms(i))];
+            end
+        end
+        
+        function dofuzzyKMeans(data, p0)
         end
     end
     
 end
 
-function CP = pickRandomPrototypes(data)
-    
-    % gets a row of 10 columns with random indices from data set range
-    perms = randperm(size(data,2), Clustering.K);
-    %Cluster Prototypes
-    CP = zeros(length(perms),2);
-    
-    for i = 1:length(CP)
-        CP(i,:) = [data(1,perms(i)) data(2, perms(i))];
-    end
-end
+
 
 function CP = pickMeanPrototypes(data, classified)
     %classified - count all the instances of 1's 2's and their index in the
@@ -84,5 +95,9 @@ function classified = classifyMED(data, CP)
         [~, index] = min(distances);
         classified(i) = index;
     end
+    
+
 end
+
+
 
