@@ -1,6 +1,7 @@
 classdef Clustering
-    %UNTITLED4 Summary of this class goes here
-    %   Detailed explanation goes here
+    %Explanations
+    %classified: 160 elements (for each sample point), value corresponds
+    %to a number 1-10 according to which class prototype is the closest.
     
     properties (Constant)
         K = 10;
@@ -17,6 +18,17 @@ classdef Clustering
             classified = classifyMED(data, prototypes);
             
             %iterate over and over again
+            %Now iteratively go create new mean class prototypes
+            while(true)
+                %compute new cluster prototype means
+                classified = pickMeanPrototypes(data,classified)
+                
+                
+                %compare is classifed the same as before or not?
+                %if yes, retry with new calulated means
+                %if no, we are done
+                
+            end
         end
     end
     
@@ -32,6 +44,22 @@ function CP = pickRandomPrototypes(data)
     for i = 1:length(CP)
         CP(i,:) = [data(1,perms(i)) data(2, perms(i))];
     end
+end
+
+function CP = pickMeanPrototypes(data, classified)
+    %classified - count all the instances of 1's 2's and their index in the
+    %-160 range
+    CP = zeros(Clustering.K, 2);
+    %Sum the number of occurances of an
+    %Each Cluster type 1-10
+    for i = 1:Clustering.K
+        shizzles = find(classified == i);
+        x = data(1, shizzles);
+        y = data(2, shizzles);
+        CP(i,:) = [mean(x) mean(y)]
+
+    end
+
 end
 
 function classified = classifyMED(data, CP)
