@@ -28,4 +28,8 @@ cimage = reshape(multi_f8, size(multf8(:,:,1), 1), size(multf8(:,:,1), 2));
 imagesc(cimage);
 colormap(gray);
 
+figure();
+imagesc(multim);
+colormap(gray);
+
 
