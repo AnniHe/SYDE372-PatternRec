@@ -33,3 +33,7 @@ imagesc(multim);
 colormap(gray);
 
 
+%Lazy excel
+xlswrite('f32confuse.xlsx', output_matrix);
+
+
